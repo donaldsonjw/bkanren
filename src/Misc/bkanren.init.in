@@ -1,0 +1,5 @@
+(declare-library! 'bkanren 
+   :version "0.1"
+   :srfi '(bkanren)
+   :basename "bkanren"
+   :module-eval 'bkanren_make_lib)
