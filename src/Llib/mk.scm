@@ -24,7 +24,12 @@
 
    (static
       (final-class %var
-	 sym)))
+	 sym)
+      (final-class %package
+	 (S (default '()))
+	 (D (default '()))
+	 (A (default '()))
+	 (T (default '())))))
 
 
 ;; add missing r6rs remp function
@@ -45,15 +50,15 @@
 	  #f)))
 
 ;; original minikanren file
-(define c->S (lambda (c) (car c)))
+(define c->S (lambda (c::%package) (-> c S)))
 
-(define c->D (lambda (c) (cadr c)))
+(define c->D (lambda (c::%package) (-> c D)))
 
-(define c->A (lambda (c) (caddr c)))
+(define c->A (lambda (c::%package) (-> c A)))
 
-(define c->T (lambda (c) (cadddr c)))
+(define c->T (lambda (c::%package) (-> c T)))
 
-(define empty-c '(()()()()))
+(define empty-c (instantiate::%package))
 
 
 (define mzero (lambda () #f))
@@ -132,11 +137,11 @@
 (define subsume-A+
   (lambda (x* S D A T)
     (cond
-      ((null? x*) `(,S ,D ,A ,T))
+      ((null? x*) (instantiate::%package (S S) (D D) (A A) (T T)))
       (else (let ((x (car x*)))
               (let ((D/T (update-D/T x S D A T)))
                 (let ((D (car D/T)) (T (cdr D/T)))
-                  `(,S ,D ,A ,T))))))))
+                  (instantiate::%package (S S) (D D) (A A) (T T)))))))))
 
 (define ext-A 
   (lambda (x tag pred S A)
@@ -182,7 +187,7 @@
                 (let ((D+ (subsume A D+)))
                   (let ((D+ (subsume T D+)))
                     (let ((D (append D+ D)))
-                      (unit `(,S ,D ,A ,T)))))))))))
+                      (unit (instantiate::%package (S S) (D D) (A A) (T T))))))))))))
 
 (define prefix-S
   (lambda (S+ S)
@@ -323,7 +328,7 @@
     (cond
       ((null? x*)
        (let ((T (append T+ T)))
-         `(,S ,D ,A ,T)))
+         (instantiate::%package (S S) (D D) (A A) (T T))))
       (else
        (let ((x (car x*)) (x* (cdr x*)))
          (let ((D/T (update-D/T x S D A T+)))

@@ -91,7 +91,11 @@ $(UCLASSDIR)/%.class:src/Llib/%.scm
 
 #targets
 
-all: .jfile .afile .etags lib recette/test$(LIBNAME)
+c: .afile .etags lib recette/test$(LIBNAME)
+
+jvm: .jfile .afile .etags libj
+
+all: c jvm
 
 
 .afile: $(BIGLOOSRCS)
@@ -103,7 +107,9 @@ all: .jfile .afile .etags lib recette/test$(LIBNAME)
 .etags: $(BIGLOOSRCS)
 	$(BGLTAGS) -o $@ $^
 
-heap: $(DISTDIR)/$(LIBNAME).heap $(DISTDIR)/$(LIBNAME).jheap 
+heap: $(DISTDIR)/$(LIBNAME).heap 
+
+jheap: $(DISTDIR)/$(LIBNAME).jheap 
 
 $(DISTDIR)/$(LIBNAME).heap: $(DISTDIR) $(HEAPSRC)
 	$(BIGLOO) $(BHEAPFLAGS) $(HEAPSRC)  -addheap $@
@@ -125,7 +131,9 @@ $(EUCLASSDIR)/make_lib.class:src/Misc/make_lib.scm
 	$(BIGLOO) -jvm -c $(BUNSAFEFLAGS) -o $@ $^
 
 
-lib: init heap lib_s lib_u lib_s.a lib_u.a lib_es lib_eu jar_s jar_u jar_es jar_eu
+lib: init heap lib_s lib_u lib_s.a lib_u.a lib_es lib_eu 
+
+libj: init jheap heap jar_s jar_u jar_es jar_eu
 
 init: $(DISTDIR) $(DISTDIR)/$(LIBNAME).init
 
@@ -191,7 +199,7 @@ $(EUCLASSDIR):
 
 
 check-syntax: .afile
-	$(BIGLOO) -afile .afile -syntax-check ${CHK_SOURCES}
+	$(BIGLOO) -afile .afile -syntax-check -L $(DISTDIR) ${CHK_SOURCES}
 
 
 
