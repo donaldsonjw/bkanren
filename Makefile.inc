@@ -155,24 +155,24 @@ jar_eu : $(UCLASSDIR) $(DISTDIR) $(EUNSAFECLASSES)
 
 
 lib_s: $(OBJDIR) $(DISTDIR) $(SAFEOBJECTS)
-	$(LD) -G -o $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).so $(SAFEOBJECTS) -lc -lm
+	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).so $(SAFEOBJECTS) -lc -lm
 
 lib_s.a : $(OBJDIR) $(DISTDIR) $(SAFEOBJECTS)
 	$(AR) qcv $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).a $(SAFEOBJECTS);\
 	$(RANLIB) $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).a
 
 lib_es : $(OBJDIR) $(DISTDIR) $(ESAFEOBJECTS)
-	$(LD) -G -o $(DISTDIR)/lib$(LIBNAME)_es-$(VERSION).so $(ESAFEOBJECTS) -lc -lm
+	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_es-$(VERSION).so $(ESAFEOBJECTS) -lc -lm
 
 lib_u : $(OBJDIR) $(DISTDIR) $(UNSAFEOBJECTS)
-	$(LD) -G -o $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).so $(UNSAFEOBJECTS) -lc -lm
+	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).so $(UNSAFEOBJECTS) -lc -lm
 
 lib_u.a : $(OBJDIR) $(DISTDIR) $(UNSAFEOBJECTS)
 	$(AR) qcv $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).a $(SAFEOBJECTS);\
 	$(RANLIB) $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).a
 
 lib_eu : $(OBJDIR) $(DISTDIR) $(EUNSAFEOBJECTS)
-	$(LD) -G -o $(DISTDIR)/lib$(LIBNAME)_eu-$(VERSION).so $(EUNSAFEOBJECTS) -lc -lm
+	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_eu-$(VERSION).so $(EUNSAFEOBJECTS) -lc -lm
 
 
 recette/test$(LIBNAME) : recette/test$(LIBNAME).scm lib 
