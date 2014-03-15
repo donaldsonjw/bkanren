@@ -1,18 +1,43 @@
+
+SYSTEM := $(shell uname -s)
+
 #TOOLS
 BIGLOO = bigloo
 BGLAFILE = bglafile
 BGLJFILE = bgljfile
 BGLTAGS = bgltags
-LD = ld
+
+ifeq ($(SYSTEM), DARWIN) 
+   LD = clang
+   LDOPT = -dynamiclib -single_module -Wl,-read_only_relocs,suppress
+   SHAREDSUFFIX = dylib
+else ifeq ($(SYSTEM), MINGW32_NT-6.0)
+   LD = gcc
+   LDOPT = -shared
+   SHAREDSUFFIX = dll
+else # Linux
+   LD = gcc
+   LDOPT = -shared
+   SHAREDSUFFIX = so
+endif
+
+
 AR = ar 
 RANLIB = ranlib
 INSTALL = install
 LINK = ln
 JAR = jar
 
+
+
 BIGLOO_VERSION := $(shell $(BIGLOO) -eval "(print *bigloo-version*) (exit 0)" -q)
 BIGLOOLIBDIR := $(shell $(BIGLOO) -eval "(print *default-lib-dir*) (exit 0)" -q)
 
+BIGLOOGC := $(shell $(BIGLOO) -eval "(print *gc-lib*) (exit 0)" -q)-$(BIGLOO_VERSION)
+
+BIGLOOSRUNLIB := bigloo_s-$(BIGLOO_VERSION)
+
+BIGLOOURUNLIB := bigloo_s-$(BIGLOO_VERSION)
 
 #install related variables
 DESTDIR = /usr
@@ -155,24 +180,24 @@ jar_eu : $(UCLASSDIR) $(DISTDIR) $(EUNSAFECLASSES)
 
 
 lib_s: $(OBJDIR) $(DISTDIR) $(SAFEOBJECTS)
-	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).so $(SAFEOBJECTS) -lc -lm
+	$(LD) $(LDOPT) -o $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).$(SHAREDSUFFIX) $(SAFEOBJECTS) -L$(BIGLOOLIBDIR) -l$(BIGLOOSRUNLIB) -l$(BIGLOOGC) -lc -lm
 
 lib_s.a : $(OBJDIR) $(DISTDIR) $(SAFEOBJECTS)
 	$(AR) qcv $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).a $(SAFEOBJECTS);\
 	$(RANLIB) $(DISTDIR)/lib$(LIBNAME)_s-$(VERSION).a
 
 lib_es : $(OBJDIR) $(DISTDIR) $(ESAFEOBJECTS)
-	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_es-$(VERSION).so $(ESAFEOBJECTS) -lc -lm
+	$(LD) $(LDOPT) -o $(DISTDIR)/lib$(LIBNAME)_es-$(VERSION).$(SHAREDSUFFIX) $(ESAFEOBJECTS) -L$(BIGLOOLIBDIR)  -L$(DISTDIR) -l$(LIBNAME)_s-$(VERSION) -l$(BIGLOOSRUNLIB) -l$(BIGLOOGC) -lc -lm
 
 lib_u : $(OBJDIR) $(DISTDIR) $(UNSAFEOBJECTS)
-	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).so $(UNSAFEOBJECTS) -lc -lm
+	$(LD) $(LDOPT) -o $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).$(SHAREDSUFFIX) $(UNSAFEOBJECTS) -L$(BIGLOOLIBDIR) -l$(BIGLOOURUNLIB) -l$(BIGLOOGC) -lc -lm
 
 lib_u.a : $(OBJDIR) $(DISTDIR) $(UNSAFEOBJECTS)
 	$(AR) qcv $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).a $(SAFEOBJECTS);\
 	$(RANLIB) $(DISTDIR)/lib$(LIBNAME)_u-$(VERSION).a
 
 lib_eu : $(OBJDIR) $(DISTDIR) $(EUNSAFEOBJECTS)
-	$(LD) -shared -o $(DISTDIR)/lib$(LIBNAME)_eu-$(VERSION).so $(EUNSAFEOBJECTS) -lc -lm
+	$(LD) $(LDOPT) -o $(DISTDIR)/lib$(LIBNAME)_eu-$(VERSION).$(SHAREDSUFFIX) $(EUNSAFEOBJECTS) -L$(BIGLOOLIBDIR) -L$(DISTDIR) -l$(LIBNAME)_u-$(VERSION) -l$(BIGLOOURUNLIB) -l$(BIGLOOGC) -lc -lm
 
 
 recette/test$(LIBNAME) : recette/test$(LIBNAME).scm lib 
@@ -207,7 +232,7 @@ install: all
 	for file in $(DISTDIR)/*; do \
 	  $(INSTALL) $$file $(INSTBIGLOOLIBDIR)/`basename $$file`; \
 	done; \
-	for file in $(DISTDIR)/*.so; do \
+	for file in $(DISTDIR)/*.$(SHAREDSUFFIX); do \
 	  $(LINK) -s $(INSTBIGLOOLIBDIR)/`basename $$file` $(INSTLIBDIR)/`basename $$file`; \
 	done
 
