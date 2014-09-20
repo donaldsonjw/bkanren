@@ -40,7 +40,7 @@ BIGLOOSRUNLIB := bigloo_s-$(BIGLOO_VERSION)
 BIGLOOURUNLIB := bigloo_s-$(BIGLOO_VERSION)
 
 #install related variables
-DESTDIR = /usr
+DESTDIR = /usr/local
 INSTLIBDIR = $(DESTDIR)/lib
 INSTBIGLOOLIBDIR = $(INSTLIBDIR)/bigloo/$(BIGLOO_VERSION)
 

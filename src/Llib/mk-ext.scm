@@ -24,7 +24,8 @@
 	   anyo
 	   nevero
 	   alwayso
-	   salo))
+	   salo
+   ))
 
 
 (define caro (lambda (p a)
