@@ -6,8 +6,7 @@
 	   choice
 	   empty-f
 	   reify
-	   var
-	   var?
+	   var var? eigen-var eigen-absento
 	   empty-c make-c
 	   mplus
 	   succeed
@@ -437,10 +436,10 @@
 
 (define for-all
   (lambda (f ls . more)
-    (let for-all ((ls ls) (more more) (a #t))
+    (let for-all ([ls ls] [more more] [a #t])
       (if (null? ls)
           a
-          (let ((a (apply f (car ls) (map car more))))
+          (let ([a (apply f (car ls) (map car more))])
             (and a (for-all (cdr ls) (map cdr more) a)))
 	  ))
     ))
@@ -543,15 +542,16 @@
   (lambda (u v)
     (lambdag@ (c : B E S D Y N T)
       (cond
-        ((mem-check u v S) (mzero))
-        (else (unit (make-c B E S D Y N `((,u . ,v) . ,T))))))))
+        [(mem-check u v S) (mzero)]
+        [else (unit (make-c B E S D Y N `((,u . ,v) . ,T)))]))))
 
 (define eigen-absento
   (lambda (e* x*)
     (lambdag@ (c : B E S D Y N T)
       (cond
-        ((eigen-occurs-check e* x* S) (mzero))
-        (else (unit (make-c B `((,e* . ,x*) . ,E) S D Y N T)))))))
+        [(eigen-occurs-check e* x* S) (mzero)]
+        [else (unit (make-c B `((,e* . ,x*) . ,E) S D Y N T))]))))
+
 
 (define mem-check
   (lambda (u t S)
@@ -589,17 +589,18 @@
   (lambda (u)
     (lambdag@ (c : B E S D Y N T)
       (cond
-        ((ground-non-symbol? u S) (mzero))
-        ((mem-check u N S) (mzero))
-        (else (unit (make-c B E S D `(,u . ,Y) N T)))))))
+        [(ground-non-symbol? u S) (mzero)]
+        [(mem-check u N S) (mzero)]
+        [else (unit (make-c B E S D `(,u . ,Y) N T))]))))
 
 (define numbero 
   (lambda (u)
     (lambdag@ (c : B E S D Y N T)
       (cond
-        ((ground-non-number? u S) (mzero))
-        ((mem-check u Y S) (mzero))
-        (else (unit (make-c B E S D Y `(,u . ,N) T)))))))
+        [(ground-non-number? u S) (mzero)]
+        [(mem-check u Y S) (mzero)]
+        [else (unit (make-c B E S D Y `(,u . ,N) T))]))))
+
 ;; end moved
 
 (define =/= ;; moved
