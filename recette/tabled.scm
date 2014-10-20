@@ -1,3 +1,4 @@
+
 (module
   memoed
   (library bkanren)
@@ -393,7 +394,14 @@
       (stored-shrink-walk v s)
       (stored-shrink-walk w s))))
 
-
+; (define do-dtest
+;   (lambda (thunk error)
+;      (letrec ((max-ticks 9999999))
+;        ((make-engine thunk)
+;         max-ticks
+;         (lambda (t v)
+;            (error "failed to diverge" (- max-ticks t) v))
+;         not))))
 
 (define skipped-tests
   ((lambda (ls)
