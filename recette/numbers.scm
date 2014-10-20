@@ -1,6 +1,8 @@
+; begin
 (module testnumbers
-   (library bkanren)
-   );(main main))
+   (library bkanren srfi1)
+   (main main)
+   )
 
 (define-syntax verify (syntax-rules (=== == = => ==> ===> -> --> ---> := :->)
  ([_ name term = data] (verify name term [=] data))
@@ -218,7 +220,7 @@
          (== `(,b . ,n^) h)
          (== '() l)))
       ((fresh (n^)
-         (==  `(1 . ,n^) n)
+         (== `(1 . ,n^) n)
          (== '() r)
          (== n^ h)
          (== '(1) l)))
@@ -321,7 +323,7 @@
   (lambda (b q n)
     (logo n b q '())))
 
-;(define (main args)
+(define (main args)
   (verify "sums"
   (run 5 (q)
     (fresh (x y z)
@@ -346,4 +348,5 @@
     ((1 1) (0 0 0 1) (0 0 0 1 1))
     ((0 1 1) (0 0 1) (0 0 0 1 1))
     ((0 0 1 1) (0 1) (0 0 0 1 1)))
-;)
+)
+; the end
