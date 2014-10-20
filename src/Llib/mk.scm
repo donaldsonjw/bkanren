@@ -5,18 +5,14 @@
 	   ==
 	   choice
 	   empty-f
-	   reify
+	   reify walk*
 	   var var? eigen-var eigen-absento
 	   empty-c make-c
-	   mplus
-	   succeed
-	   fail
-	   unit
-	   absento
+	   ground?
+	   mplus mzero
+	   succeed fail unit
+	   absento symbolo numbero booleano
 	   onceo
-	   symbolo
-	   numbero
-	   booleano
 	   =/=
 	   c->B
 	   c->E
@@ -41,6 +37,15 @@
 	 (T (default '()))
 	 ))
    )
+;;; newer version: Sept. 18 2013 (with eigens)
+;;; Jason Hemann, Will Byrd, and Dan Friedman
+;;; E = (e* . x*)*, where e* is a list of eigens and x* is a list of variables.
+;;; Each e in e* is checked for any of its eigens be in any of its x*.  Then it fails.
+;;; Since eigen-occurs-check is chasing variables, we might as will do a memq instead
+;;; of an eq? when an eigen is found through a chain of walks.  See eigen-occurs-check.
+;;; All the e* must be the eigens created as part of a single eigen.  The reifier just
+;;; abandons E, if it succeeds.  If there is no failure by then, there were no eigen
+;;; violations.
 
 
 ;; add missing r6rs remp function
@@ -70,6 +75,7 @@
 (define c->T (lambda (c::%package) (-> c T)))
 
 (define empty-c (instantiate::%package))
+
 (define (make-c b e s d y n t)
    (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (T t)))
 
@@ -91,13 +97,17 @@
   (lambda (x)
     (and (vector? x) (eq? (vector-ref x 0) eigen-tag))))
 
-(define var
-  (lambda (dummy)
-    (vector dummy)))
+(define var (lambda (dummy)::symbol (instantiate::%var (sym dummy))))
 
-(define var?
-  (lambda (x)
-    (and (vector? x) (not (eq? (vector-ref x 0) eigen-tag)))))
+(define var? (lambda (x) (isa? x %var)))
+
+; (define var
+;   (lambda (dummy)
+;     (vector dummy)))
+
+; (define var?
+;   (lambda (x)
+;     (and (vector? x) (not (eq? (vector-ref x 0) eigen-tag)))))
 
 (define walk
   (lambda (u S)
@@ -274,6 +284,10 @@
        (or (anyvar? (car u) r)
            (anyvar? (cdr u) r)))
       (else (var? (walk u r))))))
+
+(define (ground? u)
+  (lambda (S)
+    (not (anyvar? u S))))
 
 (define anyeigen? 
   (lambda (u r)
@@ -578,6 +592,7 @@
         (cond
           ((var? u) #f)
           (else (not (pred u))))))))
+
 ;; moved 
 (define ground-non-symbol?
   (ground-non-<type>? symbol?))

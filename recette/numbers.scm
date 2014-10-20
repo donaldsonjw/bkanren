@@ -1,6 +1,6 @@
 ; begin
 (module testnumbers
-   (library bkanren srfi1)
+   (library bkanren); srfi1)
    (main main)
    )
 
