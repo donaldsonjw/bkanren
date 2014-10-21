@@ -19,7 +19,14 @@
 	     (Y (c->Y c)) (N (c->N c)) (T (c->T c)))
          e)))))
 
-
+(define-syntax all
+  (syntax-rules ()
+    ([_] succeed)
+    ([_ g] g)
+    ([_ g0 g ...]
+     (let ([g^ g0])
+       (lambdag@ (s) (bind (g^ s) (lambdag@ (s) ((all g ...) s))))))
+    ))
  
 (define-syntax case-inf
   (syntax-rules ()
