@@ -1,4 +1,6 @@
 (module bkanren_make_lib
-   (import minikanren
-	   minikanren-ext)
+   (import bkanren
+	   bkanren-ext
+	   ;bkanren-tabled
+	   )
    (eval (export-all)))

@@ -13,10 +13,10 @@
      (lambda (c)
        (let ((B (c->B c)) (E (c->E c)) (S (c->S c)))
          e)))
-    ((_ (c : B E S D Y N T) e)
+    ((_ (c : B E S D Y N G T) e)
      (lambda (c)
        (let ((B (c->B c)) (E (c->E c)) (S (c->S c)) (D (c->D c))
-	     (Y (c->Y c)) (N (c->N c)) (T (c->T c)))
+	     (Y (c->Y c)) (N (c->N c)) (G (c->G c)) (T (c->T c)))
          e)))))
 
 (define-syntax all
@@ -44,11 +44,11 @@
 (define-syntax fresh
   (syntax-rules ()
     ((_ (x ...) g0 g ...)
-     (lambdag@ (c : B E S D Y N T)
+     (lambdag@ (c : B E S D Y N G T)
        (inc
          (let ((x (var 'x)) ...)
            (let ((B (append `(,x ...) B)))
-             (bind* (g0 (make-c B E S D Y N T)) g ...))))))))
+             (bind* (g0 (make-c B E S D Y N G T)) g ...))))))))
 
 (define-syntax eigen
   (syntax-rules ()

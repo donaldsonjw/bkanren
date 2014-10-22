@@ -1,4 +1,4 @@
-(module minikanren
+(module bkanren
    (include "mk.sch")
    (export mk-take
 	   bind
@@ -11,16 +11,10 @@
 	   ground?
 	   mplus mzero
 	   succeed fail unit
-	   absento symbolo numbero booleano
+	   absento symbolo numbero booleano stringo
 	   onceo
 	   =/=
-	   c->B
-	   c->E
-	   c->S
-	   c->D
-	   c->Y
-	   c->N
-	   c->T
+	   c->B c->E c->S c->D c->Y c->N c->G c->T
 	   else
 	   )
 
@@ -34,6 +28,7 @@
 	 (D (default '()))
 	 (Y (default '()))
 	 (N (default '()))
+	 (G (default '()))
 	 (T (default '()))
 	 ))
    )
@@ -72,12 +67,13 @@
 (define c->D (lambda (c::%package) (-> c D)))
 (define c->Y (lambda (c::%package) (-> c Y)))
 (define c->N (lambda (c::%package) (-> c N)))
+(define c->G (lambda (c::%package) (-> c G)))
 (define c->T (lambda (c::%package) (-> c T)))
 
 (define empty-c (instantiate::%package))
 
-(define (make-c b e s d y n t)
-   (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (T t)))
+(define (make-c b e s d y n g t)
+   (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (G g) (T t)))
 
 (define eigen-tag (vector 'eigen-tag))
 
@@ -308,21 +304,21 @@
 ;;;
 
 (define drop-N-b/c-const
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (let ((const? (lambda (n)
                     (not (var? (walk n S))))))
       (cond
         ((find const? N) =>
-         (lambda (n) (make-c B E S D Y (remq1 n N) T)))
+         (lambda (n) (make-c B E S D Y (remq1 n N) G T)))
         (else c)))))
 
 (define drop-Y-b/c-const
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (let ((const? (lambda (y)
                     (not (var? (walk y S))))))
       (cond
 	((find const? Y) =>
-         (lambda (y) (make-c B E S D (remq1 y Y) N T)))
+         (lambda (y) (make-c B E S D (remq1 y Y) N G T)))
         (else c)))))
 
 (define remq1
@@ -354,42 +350,43 @@
                  (else (loop (cdr set^))))))))))))
 
 (define drop-N-b/c-dup-var
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       (((find-dup same-var? S) N) =>
-       (lambda (n) (make-c B E S D Y (remq1 n N) T)))
+       (lambda (n) (make-c B E S D Y (remq1 n N) G T)))
       (else c))))
 
 (define drop-Y-b/c-dup-var
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       (((find-dup same-var? S) Y) =>
        (lambda (y)
-         (make-c B E S D (remq1 y Y) N T)))
+         (make-c B E S D (remq1 y Y) N G T)))
       (else c))))
 
 (define var-type-mismatch?
-  (lambda (S Y N t1^ t2^)
+  (lambda (S Y N G t1^ t2^)
     (cond
       ((num? S N t1^) (not (num? S N t2^)))
       ((sym? S Y t1^) (not (sym? S Y t2^)))
+      ((str? S G t1^) (not (str? S G t2^)))
       (else #f))))
 
 (define term-ununifiable?
-  (lambda (S Y N t1 t2)
+  (lambda (S Y N G t1 t2)
     (let ((t1^ (walk t1 S))
           (t2^ (walk t2 S)))
       (cond
         ((or (untyped-var? S Y N t1^) (untyped-var? S Y N t2^)) #f)
-        ((var? t1^) (var-type-mismatch? S Y N t1^ t2^))
-        ((var? t2^) (var-type-mismatch? S Y N t2^ t1^))
+        ((var? t1^) (var-type-mismatch? S Y N G t1^ t2^))
+        ((var? t2^) (var-type-mismatch? S Y N G t2^ t1^))
         ((and (pair? t1^) (pair? t2^))
-         (or (term-ununifiable? S Y N (car t1^) (car t2^))
-             (term-ununifiable? S Y N (cdr t1^) (cdr t2^))))
+         (or (term-ununifiable? S Y N G (car t1^) (car t2^))
+             (term-ununifiable? S Y N G (cdr t1^) (cdr t2^))))
         (else (not (eqv? t1^ t2^)))))))
 
 (define T-term-ununifiable?
-  (lambda (S Y N)
+  (lambda (S Y N G)
     (lambda (t1)
       (let ((t1^ (walk t1 S)))
         (letrec
@@ -398,10 +395,10 @@
                 (let ((t2^ (walk t2 S)))
                   (cond
                     ((pair? t2^) (and
-                                  (term-ununifiable? S Y N t1^ t2^)
+                                  (term-ununifiable? S Y N G t1^ t2^)
                                   (t2-check (car t2^))
                                   (t2-check (cdr t2^))))
-                    (else (term-ununifiable? S Y N t1^ t2^)))))))
+                    (else (term-ununifiable? S Y N G t1^ t2^)))))))
           t2-check)))))
 
 (define num?
@@ -418,16 +415,23 @@
         ((var? y) (tagged? S Y y))
         (else (symbol? y))))))
 
+(define str?
+  (lambda (S G y)
+    (let ((n (walk y S)))
+      (cond
+        ((var? y) (tagged? S G y))
+        (else (string? y))))))
+
 (define drop-T-b/c-Y-and-N
-  (lambdag@ (c : B E S D Y N T)
-    (let ((drop-t? (T-term-ununifiable? S Y N)))
+  (lambdag@ (c : B E S D Y N G T)
+    (let ((drop-t? (T-term-ununifiable? S Y N G)))
       (cond
         ((find (lambda (t) ((drop-t? (lhs t)) (rhs t))) T) =>
-         (lambda (t) (make-c B E S D Y N (remq1 t T))))
+         (lambda (t) (make-c B E S D Y N G (remq1 t T))))
         (else c)))))
 
 (define move-T-to-D-b/c-t2-atom
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       ((exists (lambda (t)
                (let ((t2^ (walk (rhs t) S)))
@@ -435,7 +439,7 @@
                    ((and (not (untyped-var? S Y N t2^))
                          (not (pair? t2^)))
                     (let ((T (remq1 t T)))
-                      (make-c B E S `((,t) . ,D) Y N T)))
+                      (make-c B E S `((,t) . ,D) Y N G T)))
                    (else #f))))
              T))
       (else c))))
@@ -482,7 +486,7 @@
           (else #f))))))
 
 (define drop-from-D-b/c-T
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       ((find
            (lambda (d)
@@ -490,11 +494,11 @@
                  (T-superfluous-pr? S Y N T)
                d))
          D) =>
-         (lambda (d) (make-c B E S (remq1 d D) Y N T)))
+         (lambda (d) (make-c B E S (remq1 d D) Y N G T)))
       (else c))))
 
 (define drop-t-b/c-t2-occurs-t1
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       ((find (lambda (t)
                (let ((t-a^ (walk (lhs t) S))
@@ -502,11 +506,11 @@
                  (mem-check t-d^ t-a^ S)))
              T) =>
              (lambda (t)
-               (make-c B E S D Y N (remq1 t T))))
+               (make-c B E S D Y N G (remq1 t T))))
       (else c))))
 
 (define split-t-move-to-d-b/c-pair
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
       ((exists
          (lambda (t)
@@ -515,26 +519,26 @@
                ((pair? t2^) (let ((ta `(,(lhs t) . ,(car t2^)))
                                   (td `(,(lhs t) . ,(cdr t2^))))
                               (let ((T `(,ta ,td . ,(remq1 t T))))
-                                (make-c B E S `((,t) . ,D) Y N T))))
+                                (make-c B E S `((,t) . ,D) Y N G T))))
                (else #f))))
          T))
       (else c))))
 
 (define find-d-conflict
-  (lambda (S Y N)
+  (lambda (S Y N G)
     (lambda (D)
       (find
        (lambda (d)
 	 (exists (lambda (pr)
-		   (term-ununifiable? S Y N (lhs pr) (rhs pr)))
+		   (term-ununifiable? S Y N G (lhs pr) (rhs pr)))
 		 d))
        D))))
 
 (define drop-D-b/c-Y-or-N
-  (lambdag@ (c : B E S D Y N T)
+  (lambdag@ (c : B E S D Y N G T)
     (cond
-      (((find-d-conflict S Y N) D) =>
-       (lambda (d) (make-c B E S (remq1 d D) Y N T)))
+      (((find-d-conflict S Y N G) D) =>
+       (lambda (d) (make-c B E S (remq1 d D) Y N G T)))
       (else c))))
 
 (define cycle
@@ -554,17 +558,17 @@
 
 (define absento
   (lambda (u v)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         [(mem-check u v S) (mzero)]
-        [else (unit (make-c B E S D Y N `((,u . ,v) . ,T)))]))))
+        [else (unit (make-c B E S D Y N G `((,u . ,v) . ,T)))]))))
 
 (define eigen-absento
   (lambda (e* x*)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         [(eigen-occurs-check e* x* S) (mzero)]
-        [else (unit (make-c B `((,e* . ,x*) . ,E) S D Y N T))]))))
+        [else (unit (make-c B `((,e* . ,x*) . ,E) S D Y N G T))]))))
 
 
 (define mem-check
@@ -594,6 +598,9 @@
           (else (not (pred u))))))))
 
 ;; moved 
+(define ground-non-string?
+  (ground-non-<type>? string?))
+
 (define ground-non-symbol?
   (ground-non-<type>? symbol?))
 
@@ -602,43 +609,51 @@
 
 (define symbolo
   (lambda (u)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         [(ground-non-symbol? u S) (mzero)]
         [(mem-check u N S) (mzero)]
-        [else (unit (make-c B E S D `(,u . ,Y) N T))]))))
+        [else (unit (make-c B E S D `(,u . ,Y) N G T))]))))
+
+(define stringo
+  (lambda (u)
+    (lambdag@ (c : B E S D Y N G T)
+      (cond
+        [(ground-non-string? u S) (mzero)]
+        [(mem-check u N S) (mzero)]
+        [else (unit (make-c B E S D Y N `(,u . ,G) T))]))))
 
 (define numbero 
   (lambda (u)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         [(ground-non-number? u S) (mzero)]
         [(mem-check u Y S) (mzero)]
-        [else (unit (make-c B E S D Y `(,u . ,N) T))]))))
+        [else (unit (make-c B E S D Y `(,u . ,N) G T))]))))
 
 ;; end moved
 
 (define =/= ;; moved
   (lambda (u v)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         ((unify u v S) =>
          (lambda (S0)
            (let ((pfx (prefix-S S0 S)))
              (cond
                ((null? pfx) (mzero))
-               (else (unit (make-c B E S `(,pfx . ,D) Y N T)))))))
+               (else (unit (make-c B E S `(,pfx . ,D) Y N G T)))))))
         (else c)))))
 
 (define ==
   (lambda (u v)
-    (lambdag@ (c : B E S D Y N T)
+    (lambdag@ (c : B E S D Y N G T)
       (cond
         ((unify u v S) =>
          (lambda (S0)
            (cond
-             ((==fail-check B E S0 D Y N T) (mzero))
-             (else (unit (make-c B E S0 D Y N T))))))
+             ((==fail-check B E S0 D Y N G T) (mzero))
+             (else (unit (make-c B E S0 D Y N G T))))))
         (else (mzero))))))
 
 (define succeed (== #f #f))
@@ -646,12 +661,13 @@
 (define fail (== #f #t))
 
 (define ==fail-check
-  (lambda (B E S0 D Y N T)
+  (lambda (B E S0 D Y N G T)
     (cond
       ((eigen-absento-fail-check E S0) #t)
+      ((atomic-fail-check S0 G ground-non-string?) #t)
       ((atomic-fail-check S0 Y ground-non-symbol?) #t)
       ((atomic-fail-check S0 N ground-non-number?) #t)
-      ((symbolo-numbero-fail-check S0 Y N) #t)
+      ((symbolo-numbero-stringo-fail-check S0 Y N G) #t)
       ((=/=-fail-check S0 D) #t)
       ((absento-fail-check S0 T) #t)
       (else #f))))
@@ -664,8 +680,8 @@
   (lambda (S A pred)
     (exists (lambda (a) (pred (walk a S) S)) A)))
 
-(define symbolo-numbero-fail-check
-  (lambda (S A N)
+(define symbolo-numbero-stringo-fail-check
+  (lambda (S A N G)
     (let ((N (map (lambda (n) (walk n S)) N)))
       (exists (lambda (a) (exists (same-var? (walk a S)) N))
         A))))
@@ -694,6 +710,7 @@
              (D (walk* (c->D c) S))
              (Y (walk* (c->Y c) S))
              (N (walk* (c->N c) S))
+	     (G (walk* (c->G c) S))
              (T (walk* (c->T c) S)))
         (let ((v (walk* x S)))
           (let ((R (reify-S v '())))
@@ -712,28 +729,34 @@
                     (remp
                      (lambda (n) (var? (walk n R)))
                      N)
+                    (remp
+                     (lambda (g) (var? (walk g R)))
+                     G)
                     (remp (lambda (t)
                             (or (anyeigen? t R) (anyvar? t R))) T)))))))))
 
 (define reify+
-  (lambda (v R D Y N T)
+  (lambda (v R D Y N G T)
     (form (walk* v R)
           (walk* D R)
           (walk* Y R)
           (walk* N R)
+          (walk* G R)
           (rem-subsumed-T (walk* T R)))))
 
 (define form
-  (lambda (v D Y N T)
+  (lambda (v D Y N G T)
     (let ((fd (sort-D D))
           (fy (sorter Y))
           (fn (sorter N))
+          (fg (sorter G))	  
           (ft (sorter T)))
       (let ((fd (if (null? fd) fd
                     (let ((fd (drop-dot-D fd)))
                       `((=/= . ,fd)))))
             (fy (if (null? fy) fy `((sym . ,fy))))
             (fn (if (null? fn) fn `((num . ,fn))))
+            (fg (if (null? fg) fg `((str . ,fg))))
             (ft (if (null? ft) ft
                     (let ((ft (drop-dot ft)))
                       `((absento . ,ft))))))

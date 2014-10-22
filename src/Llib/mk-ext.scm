@@ -1,6 +1,6 @@
-(module minikanren-ext
+(module bkanren-ext
    (include "mk.sch")
-   (import minikanren)
+   (import bkanren)
    (export caro
 	   cdro
 	   conso
