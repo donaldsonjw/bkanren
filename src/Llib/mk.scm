@@ -310,6 +310,15 @@
 
 ;;;
 
+(define drop-G-b/c-const
+  (lambdag@ (c : B E S D Y N G T)
+    (let ((const? (lambda (n)
+                    (not (var? (walk n S))))))
+      (cond
+        ((find const? G) =>
+         (lambda (g) (make-c B E S D Y N (remq1 g G) T)))
+        (else c)))))
+
 (define drop-N-b/c-const
   (lambdag@ (c : B E S D Y N G T)
     (let ((const? (lambda (n)
@@ -355,6 +364,13 @@
                         (cdr set^))
                   elem)
                  (else (loop (cdr set^))))))))))))
+
+(define drop-G-b/c-dup-var
+  (lambdag@ (c : B E S D Y N G T)
+    (cond
+      (((find-dup same-var? S) G) =>
+       (lambda (g) (make-c B E S D Y N (remq1 g G) T)))
+      (else c))))
 
 (define drop-N-b/c-dup-var
   (lambdag@ (c : B E S D Y N G T)
@@ -423,11 +439,11 @@
         (else (symbol? y))))))
 
 (define str?
-  (lambda (S G y)
-    (let ((n (walk y S)))
+  (lambda (S G g)
+    (let ((n (walk g S)))
       (cond
-        ((var? y) (tagged? S G y))
-        (else (string? y))))))
+        ((var? g) (tagged? S G g))
+        (else (string? g))))))
 
 (define drop-T-b/c-Y-and-N
   (lambdag@ (c : B E S D Y N G T)
@@ -777,9 +793,10 @@
                       `((absento . ,ft))))))
         (cond
           ((and (null? fd) (null? fy)
-                (null? fn) (null? ft))
+                (null? fn) (null? fg)
+		(null? ft))
            v)
-          (else (append `(,v) fd fn fy ft)))))))
+          (else (append `(,v) fd fn fy fg ft)))))))
 
 (define sort-D
   (lambda (D)
@@ -873,8 +890,9 @@
 
 (define LOF
   (lambda ()
-    `(,drop-N-b/c-const ,drop-Y-b/c-const ,drop-Y-b/c-dup-var
-      ,drop-N-b/c-dup-var ,drop-D-b/c-Y-or-N ,drop-T-b/c-Y-and-N
+    `(,drop-G-b/c-const ,drop-N-b/c-const ,drop-Y-b/c-const
+      ,drop-G-b/c-dup-var ,drop-N-b/c-dup-var ,drop-Y-b/c-dup-var
+      ,drop-D-b/c-Y-or-N ,drop-T-b/c-Y-and-N
       ,move-T-to-D-b/c-t2-atom ,split-t-move-to-d-b/c-pair
       ,drop-from-D-b/c-T ,drop-t-b/c-t2-occurs-t1)))
 
