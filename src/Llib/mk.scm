@@ -7,7 +7,9 @@
 	   empty-f
 	   reify walk*
 	   var var? eigen-var eigen-absento
-	   empty-c make-c
+	   empty-c
+	   (inline make-c b e s d y n g t)
+	   ;(syntax make-c)
 	   ground?
 	   mplus mzero
 	   succeed fail unit
@@ -18,7 +20,7 @@
 	   else
 	   )
 
-   (static
+   (export
       (final-class %var
 	 sym)
       (final-class %package
@@ -72,8 +74,13 @@
 
 (define empty-c (instantiate::%package))
 
-(define (make-c b e s d y n g t)
-   (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (G g) (T t)))
+(define-inline (make-c b e s d y n g t)
+   (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (G g) (T t))
+   )
+; (define-syntax make-c (syntax-rules ()
+;  ([_ b e s d y n g t]
+;    (instantiate::%package (B b) (E e) (S s) (D d) (Y y) (N n) (G g) (T t))
+;    )))
 
 (define eigen-tag (vector 'eigen-tag))
 
@@ -613,6 +620,7 @@
       (cond
         [(ground-non-symbol? u S) (mzero)]
         [(mem-check u N S) (mzero)]
+        [(mem-check u G S) (mzero)]
         [else (unit (make-c B E S D `(,u . ,Y) N G T))]))))
 
 (define stringo
@@ -621,6 +629,7 @@
       (cond
         [(ground-non-string? u S) (mzero)]
         [(mem-check u N S) (mzero)]
+        [(mem-check u Y S) (mzero)]
         [else (unit (make-c B E S D Y N `(,u . ,G) T))]))))
 
 (define numbero 
@@ -629,6 +638,7 @@
       (cond
         [(ground-non-number? u S) (mzero)]
         [(mem-check u Y S) (mzero)]
+        [(mem-check u G S) (mzero)]
         [else (unit (make-c B E S D Y `(,u . ,N) G T))]))))
 
 ;; end moved
@@ -682,8 +692,13 @@
 
 (define symbolo-numbero-stringo-fail-check
   (lambda (S A N G)
-    (let ((N (map (lambda (n) (walk n S)) N)))
-      (exists (lambda (a) (exists (same-var? (walk a S)) N))
+    (let ((N (map (lambda (n) (walk n S)) N))
+	  (G (map (lambda (g) (walk g S)) G)))
+      (exists (lambda (a)
+		 (let ([a (walk a S)])
+		    (or (exists (same-var? a) N)
+			(exists (same-var? a) G)
+			)))
         A))))
 
 (define absento-fail-check
