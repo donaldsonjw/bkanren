@@ -288,9 +288,17 @@
            (anyvar? (cdr u) r)))
       (else (var? (walk u r))))))
 
-(define (ground? u)
-  (lambda (S)
-    (not (anyvar? u S))))
+; (define (ground? u)
+;   (lambda (S)
+;     (not (anyvar? u S))))
+
+(define ground?
+  (lambda (v)
+    (cond
+      ((var? v) #f)
+      ((pair? v)
+       (and (ground? (car v)) (ground? (cdr v))))
+      (else #t))))
 
 (define anyeigen? 
   (lambda (u r)
