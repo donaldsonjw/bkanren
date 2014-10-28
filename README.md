@@ -11,6 +11,7 @@ It supports the following operators:
 ### Logical Operators
 
 * fresh
+* eigen
 * conde
 
 ### Interface Operators
@@ -23,6 +24,7 @@ It supports the following operators:
 * =/= 
 * symbolo
 * numbero
+* stringo
 * absento
 
 ### Operators from The Reasoned Schemer
