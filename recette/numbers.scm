@@ -298,14 +298,14 @@
          (== `(0 . ,q1) q)
          (poso q1)
          (<lo b n)
-         (appendo b `(1 . ,b) b2)
+         (appendᵒ b `(1 . ,b) b2)
          (exp2 n b2 q1)))
       ((fresh (q1 nh b2 s)
          (== `(1 . ,q1) q)
          (poso q1)
          (poso nh)
          (splito n b s nh)
-         (appendo b `(1 . ,b) b2)
+         (appendᵒ b `(1 . ,b) b2)
          (exp2 nh b2 q1))))))
 
 (define repeated-mul
