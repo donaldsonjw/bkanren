@@ -51,16 +51,7 @@
 
 
 ;; add missing exists function
-;; simplified version of r6rs function
-;; only accepts a single list
-(define (exists proc lst)
-   (let loop ((l lst))
-      (if (pair? l)
-	  (let ((curr (car l)))
-	     (if (proc curr)
-		 curr
-		 (loop (cdr l))))
-	  #f)))
+(define exists any)
 
 ;; original minikanren file
 (define c->B (lambda (c::%package) (-> c B)))
