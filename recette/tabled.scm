@@ -1,12 +1,11 @@
 (module memoed
    (library bkanren)
-   ;(main main)
-   (import (ascript "cases.scm"))
    )
-(def-syntax conde tconde)
-(def-syntax == t==)
-(def-syntax run trun)
-(def-syntax run* trun*)
+
+(define-syntax conde (syntax-rules () ([_ . args] (tconde . args))))
+(define-syntax ==    (syntax-rules () ([_ . args] (t== . args))))
+(define-syntax run   (syntax-rules () ([_ . args] (trun . args))))
+(define-syntax run*  (syntax-rules () ([_ . args] (trun* . args))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-syntax test-check
@@ -31,8 +30,11 @@
 
 (define skipped-tests
    (let ((ls '()))
-      (fn => (map list ls)
-       ||  t => (set! ls (cons t ls))
+      (lambda args
+	 (cond ([null? args] (map list ls))
+	       ([and (list? args) (car args)] => (lambda (t)
+		(set! ls (cons t ls))
+		)))
 )))
 
 (define-syntax print
