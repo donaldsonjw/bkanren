@@ -87,7 +87,7 @@ This by default installs the libraries into the directory /usr/lib/bigloo/<biglo
 
 This will result in the libraries being installed to /path/prefix/lib/bigloo/<bigloo-version>.
 
-### Interpretor
+### Interpreter
 
 The bkanren library can be dynamically loaded into the interpretor with
 
