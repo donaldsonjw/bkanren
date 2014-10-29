@@ -7,7 +7,7 @@
       empty-s
       make-var
       reify-name treify
-      t==
+      t== tfail tsucceed
       consume
       make-data data-queue-set!
       installing-sk
@@ -112,6 +112,9 @@
 	    (cond
 	       ((unify u v s) => sk)
 	       (else fail))))))
+
+(define tfail (t== #t #f))
+(define tsucceed (t== #t #t))
 
 (define taker
    (lambda (queue sk fk)

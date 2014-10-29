@@ -14,6 +14,11 @@ It supports the following operators:
 * eigen
 * conde
 
+### Extra-logical Operators
+
+* project
+* ground?
+
 ### Interface Operators
 
 * run

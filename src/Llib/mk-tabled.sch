@@ -1,3 +1,12 @@
+(define-syntax tall
+  (syntax-rules ()
+    ([_] tsucceed)
+    ([_ g] g)
+    ([_ g0 g ...]
+     (let ([g^ g0])
+       (lambdag@ (s) (bind (g^ s) (lambdag@ (s) ((tall g ...) s))))))
+    ))
+
 (define-syntax trample
    (syntax-rules ()
       ((_ e) (lambda () e))))
@@ -82,4 +91,20 @@
 					(set! table `((,key . ,data) . ,table))
 					data)))
 			 ))))
+	     )))
+      ((_ argv g g* ...)
+       (let ((table '()))
+	  (lambda argv
+	     (lambda (s sk)
+		(let ((key ((treify reify-name) argv s)))
+		   (consume argv s sk
+		      (cond ((assoc key table) => cdr)
+			    (else (let ((data (make-data '() '() '())))
+				     (data-queue-set! data
+					`(,(trample
+					      ((exist () g g* ...) s
+								   (installing-sk argv data)))))
+				     (set! table `((,key . ,data) . ,table))
+				     data)))
+		      )))
 	     )))))

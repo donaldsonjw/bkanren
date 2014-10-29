@@ -2,7 +2,7 @@
    (include "mk.sch")
    (export mk-take
 	   bind
-	   ==
+	   == succeed fail
 	   choice
 	   empty-f
 	   reify walk*
@@ -11,8 +11,7 @@
 	   (inline make-c b e s d y n g t)
 	   ;(syntax make-c)
 	   ground?
-	   mplus mzero
-	   succeed fail unit
+	   mplus mzero unit
 	   absento symbolo numbero booleano stringo
 	   onceo
 	   =/=
