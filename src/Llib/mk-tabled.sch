@@ -1,10 +1,8 @@
 (define-syntax tall
   (syntax-rules ()
     ([_] tsucceed)
-    ([_ g] g)
-    ([_ g0 g ...]
-     (let ([g^ g0])
-       (lambdag@ (s) (bind (g^ s) (lambdag@ (s) ((tall g ...) s))))))
+    ([_ g ...]
+       (tconde (g ...)))
     ))
 
 (define-syntax trample

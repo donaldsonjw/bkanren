@@ -46,7 +46,7 @@
     ((_ (x ...) g0 g ...)
      (lambdag@ (c : B E S D Y N G T)
        (inc
-         (let ((x (var 'x)) ...)
+         (let ((x (make-var 'x)) ...)
            (let ((B (append `(,x ...) B)))
              (bind* (g0 (make-c B E S D Y N G T)) g ...))))))))
 

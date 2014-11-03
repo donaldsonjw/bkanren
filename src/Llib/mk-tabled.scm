@@ -5,8 +5,8 @@
    (export
       take* take+ take'
       empty-s
-      make-var
-      reify-name treify
+      ;make-var reify-name
+      treify
       t== tfail tsucceed
       consume
       make-data data-queue-set!
@@ -30,13 +30,13 @@
     ;(printf "~nadded resumer~n~a~n" data)
     )
 
-(define-record-type var
-   (make-var s)
-   var?
-   (s var-s))
+; (define-record-type var
+;    (make-var s)
+;    var?
+;    (s var-s))
 
-(define reify-name
-   (lambda (n) (string->symbol (string-append "_." (number->string n)))))
+; (define reify-name
+;    (lambda (n) (string->symbol (string-append "_." (number->string n)))))
 
 (define reify-var
    (lambda (s)

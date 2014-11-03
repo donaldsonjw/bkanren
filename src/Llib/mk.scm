@@ -5,8 +5,9 @@
 	   == succeed fail
 	   choice
 	   empty-f
-	   reify walk*
-	   var var? eigen-var eigen-absento
+	   (inline make-var s) var? var-s
+	   reify reify-name walk*
+	   eigen-var eigen-absento
 	   empty-c
 	   (inline make-c b e s d y n g t)
 	   ;(syntax make-c)
@@ -90,9 +91,13 @@
   (lambda (x)
     (and (vector? x) (eq? (vector-ref x 0) eigen-tag))))
 
-(define var (lambda (dummy)::symbol (instantiate::%var (sym dummy))))
+(define-inline (make-var dummy)
+   (instantiate::%var (sym dummy))
+   )
 
 (define var? (lambda (x) (isa? x %var)))
+
+(define var-s (lambda (c::%var) (-> c sym)))
 
 ; (define var
 ;   (lambda (dummy)
