@@ -5,6 +5,14 @@
        (tconde (g ...)))
     ))
 
+(define-syntax tproject
+  (syntax-rules ()
+    ((_ (x ...) g g* ...)
+     (lambdag@ (c : B E S)
+       (let ((x (walk* x S)) ...)
+         ((exist () g g* ...) c))))))
+
+
 (define-syntax trample
    (syntax-rules ()
       ((_ e) (lambda () e))))

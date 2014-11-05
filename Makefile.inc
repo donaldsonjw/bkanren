@@ -209,6 +209,8 @@ recette/numbers : recette/numbers.scm lib
 recette/tabled : recette/tabled.scm lib 
 	$(BIGLOO) -v -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
+recette/memo : recette/memo.scm lib 
+	$(BIGLOO) -v -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
 $(OBJDIR):
 	mkdir -p $@
