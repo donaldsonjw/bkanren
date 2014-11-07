@@ -5,7 +5,6 @@
 (define (main args)
    (print (run* (q)
 	     (== #t q)))
-   
    (print (run* (q)
    	     (fresh (x)
    		(== #t x)
@@ -38,7 +37,6 @@
    		((== #t q) alwayso)
    		(else fail))
    	     (== #t q)))
- 
    )
 
 

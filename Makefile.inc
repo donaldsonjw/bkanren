@@ -2,7 +2,7 @@
 SYSTEM := $(shell uname -s)
 
 #TOOLS
-BIGLOO = bigloo
+BIGLOO = bigloo -eval '(loadq "bracket-syntax.sch")'
 BGLAFILE = bglafile
 BGLJFILE = bgljfile
 BGLTAGS = bgltags
@@ -40,7 +40,7 @@ BIGLOOSRUNLIB := bigloo_s-$(BIGLOO_VERSION)
 BIGLOOURUNLIB := bigloo_s-$(BIGLOO_VERSION)
 
 #install related variables
-DESTDIR = /usr
+DESTDIR = /usr/local
 INSTLIBDIR = $(DESTDIR)/lib
 INSTBIGLOOLIBDIR = $(INSTLIBDIR)/bigloo/$(BIGLOO_VERSION)
 
@@ -203,6 +203,14 @@ lib_eu : $(OBJDIR) $(DISTDIR) $(EUNSAFEOBJECTS)
 recette/test$(LIBNAME) : recette/test$(LIBNAME).scm lib 
 	$(BIGLOO) -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
+recette/numbers : recette/numbers.scm lib 
+	$(BIGLOO) -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
+
+recette/tabled : recette/tabled.scm lib 
+	$(BIGLOO) -v -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
+
+recette/memo : recette/memo.scm lib 
+	$(BIGLOO) -v -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
 $(OBJDIR):
 	mkdir -p $@

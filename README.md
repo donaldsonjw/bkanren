@@ -11,7 +11,13 @@ It supports the following operators:
 ### Logical Operators
 
 * fresh
+* eigen
 * conde
+
+### Extra-logical Operators
+
+* project
+* ground?
 
 ### Interface Operators
 
@@ -23,6 +29,7 @@ It supports the following operators:
 * =/= 
 * symbolo
 * numbero
+* stringo
 * absento
 
 ### Operators from The Reasoned Schemer
@@ -80,7 +87,7 @@ This by default installs the libraries into the directory /usr/lib/bigloo/<biglo
 
 This will result in the libraries being installed to /path/prefix/lib/bigloo/<bigloo-version>.
 
-### Interpretor
+### Interpreter
 
 The bkanren library can be dynamically loaded into the interpretor with
 

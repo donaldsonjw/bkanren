@@ -1,6 +1,6 @@
-(module minikanren-ext
+(module bkanren-ext
    (include "mk.sch")
-   (import minikanren)
+   (import bkanren)
    (export caro
 	   cdro
 	   conso
@@ -16,7 +16,7 @@
 	   eq-caro
 	   memo
 	   rembero
-	   appendo
+	   appendᵒ
 	   unwrapo
 	   swappendo
 	   flatteno
@@ -24,7 +24,8 @@
 	   anyo
 	   nevero
 	   alwayso
-	   salo))
+	   salo
+   ))
 
 
 (define caro (lambda (p a)
@@ -122,13 +123,13 @@
 			     (conso a res out)))))))
 
 
-(define appendo (lambda (l s out)
+(define appendᵒ (lambda (l s out)
 		   (conde ((nullo l) (== s out))
 		      (else
 		       (fresh (a d res)
 			  (conso a d l)
 			  (conso a res out)
-			  (appendo d s res))))))
+			  (appendᵒ d s res))))))
 
 
 (define swappendo (lambda (l s out)
@@ -154,7 +155,7 @@
 	  (conso a d s)
 	  (flatteno a res-a)
 	  (flatteno d res-d)
-	  (appendo res-a res-d out)))
+	  (appendᵒ res-a res-d out)))
       (else
        (conso s '() out)))))
 
@@ -165,7 +166,7 @@
 			   (fresh (a d res-a res-d)
 			      (flattenrevo a res-a)
 			      (flattenrevo d res-d)
-			      (appendo res-a res-d out))))))
+			      (appendᵒ res-a res-d out))))))
 
 (define anyo (lambda (g)
 		(conde (g succeed)
