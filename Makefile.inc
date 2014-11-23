@@ -203,7 +203,7 @@ lib_eu : $(OBJDIR) $(DISTDIR) $(EUNSAFEOBJECTS)
 recette/test$(LIBNAME) : recette/test$(LIBNAME).scm lib 
 	$(BIGLOO) -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
-recette/numbers : recette/numbers.scm lib 
+recette/testnumbers : recette/testnumbers.scm lib 
 	$(BIGLOO) -static-all-bigloo $(BUNSAFEFLAGS) -L $(DISTDIR) -o $@ $< 
 
 recette/tabled : recette/tabled.scm lib 
