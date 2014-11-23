@@ -3,6 +3,7 @@
    (import bkanren bkanren-ext)
    (export
       build-num
+      zeroo poso
       pluso minuso
       *o /o
       logo expo
