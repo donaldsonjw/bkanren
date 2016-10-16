@@ -1,8 +1,7 @@
-
 SYSTEM := $(shell uname -s)
 
 #TOOLS
-BIGLOO = bigloo -eval '(loadq "bracket-syntax.sch")'
+BIGLOO = bigloo 
 BGLAFILE = bglafile
 BGLJFILE = bgljfile
 BGLTAGS = bgltags
