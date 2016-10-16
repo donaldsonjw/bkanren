@@ -1,6 +1,5 @@
 (module memoed
-   (library bkanren)
-   )
+   (library bkanren))
 
 (define-syntax conde (syntax-rules () ([_ . args] (tconde . args))))
 (define-syntax ==    (syntax-rules () ([_ . args] (t== . args))))
@@ -20,7 +19,7 @@
                "Failed: ~a\nExpected: ~a\nComputed: ~a\n"
                'tested-expression expected produced)))))))
 
-(define do-dtest
+#;(define do-dtest
    (lambda (thunk error)
       (define max-ticks 9999999)
       ((make-engine thunk)
@@ -45,23 +44,24 @@
 
 (define-syntax define-test
    (syntax-rules ()
-      ((_ name (pl ...) expr (pr ...) (do-name args ...))
+      ((define-test name (pl ...) expr (pr ...) (do-name args ...))
        (define-syntax name
 	  (syntax-rules (skip)
-	     ((_ title skip pl ... expr pr ...) (begin (print "WARNING: SKIPPING " title nl) (skipped-tests title)))
-	     ((_ title pl ... expr pr ...)
+	     ((name title skip pl ... expr pr ...) (begin (print "WARNING: SKIPPING " title nl) (skipped-tests title)))
+	     ((name title pl ... expr pr ...)
 	      (begin
 		 (print "Testing " title "...")
 		 (do-name args ... (lambda (string . irr) (apply error 'title string 'expr irr)))
 		 (print " done" nl))))))))
 
-(define-test dtest () expr () (do-dtest (lambda () expr)))
+
+;(define-test dtest () expr () (do-dtest (lambda () expr)))
 (define-test etest (equal?) expr (expe) (do-test expe equal? expr))
 (define-test test () expr (expe) (do-test expe equal? expr))
 (define-test mtest () expr (expe) (do-test expe multiset-equal? expr))
 (define-test ptest (passes?) expr () (do-test 'ptest (lambda (e c) (passes? c)) expr))
 (define-test ftest () expr (expe) (do-ftest (lambda () expr) expe))
-(define-test vtest (pred?) expr () (do-vtest (lambda () expr) pred?))
+;(define-test vtest (pred?) expr () (do-vtest (lambda () expr) pred?))
 
 (define do-test
    (lambda (expected equal? computed error)
@@ -86,7 +86,7 @@
 	       ((member (car p) expe) (do-ftest (cdr p) (remove-1 (car p) expe) error))
 	       (else (do-ftest (cdr p) expe error)))))))
 
-(define do-vtest
+#;(define do-vtest
    (lambda (th pred? error)
       (when ;guard
 	 (cond

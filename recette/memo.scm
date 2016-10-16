@@ -8,7 +8,7 @@
 ;; Peter Kourzanov
 
 (module Parse-memo
-   (library bkanren srfi1 slib)
+   (library bkanren srfi1)
 )
 
 (define-syntax verify (syntax-rules (=== == = => ==> ===> -> --> ---> := :->)

@@ -115,7 +115,7 @@ $(UCLASSDIR)/%.class:src/Llib/%.scm
 
 #targets
 
-c: .afile .etags lib recette/test$(LIBNAME)
+c: .afile .etags lib recette/test$(LIBNAME) recette/testnumbers recette/memo # remove until compilation erro resolved, recette/tabled
 
 jvm: .jfile .afile .etags libj
 
