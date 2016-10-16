@@ -63,7 +63,7 @@
 ;; uncomment the (t== Lin (cons 'b temp)) below to make it
 ;; X=z|b X a
 ;; the output of the goal is a Peano representation of n in:
-;; X=L={a^n b^n|n>=0}
+;; X=L={b^n a^n|n>=0}
 
 (define head_75
   (lambda (Lin Lout var)
@@ -79,7 +79,7 @@
        (exist (x temp temp1)
 	  (t== var (list 'S x))
 	  ; although this could be CFG, can show left-recursion problem
-	  ; with a left-regular language (therefore, don't match 'b)
+	  ; with a left-regular language too (therefore, don't match 'b)
 	  (t== Lin temp)
 	  ;(t== Lin (cons 'b temp))
 	  (X temp temp1 x)
